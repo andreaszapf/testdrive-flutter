@@ -1,9 +1,7 @@
-import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-import '../data/filesystem_entry.dart';
+import '../data/list_directory.dart';
 import 'filesystem_listing.dart';
 
 class MainPage extends StatefulWidget {
@@ -45,9 +43,7 @@ class _MainPageState extends State<MainPage> {
           Expanded(
             child: _directory.isNotEmpty
                 ? FilesystemListing(
-                    listingStream: Directory(_directory)
-                        .list(recursive: false)
-                        .map((entry) => FilesystemEntry(entry.path)),
+                    listingStream: listDirectory(_directory),
                   )
                 : const Center(),
           ),
