@@ -1,5 +1,7 @@
 #include "find_audiofiles.h"
 
+#include "find_audiofiles/find_audiofiles.h"
+
 // A very short-lived native function.
 //
 // For very short-lived functions, it is fine to call them on the main isolate.
@@ -14,6 +16,7 @@ FFI_PLUGIN_EXPORT intptr_t sum(intptr_t a, intptr_t b) { return a + b; }
 // Instead, call these native functions on a separate isolate.
 FFI_PLUGIN_EXPORT intptr_t sum_long_running(intptr_t a, intptr_t b) {
   // Simulate work.
+  faf_close(NULL); // Verify that the native library was linked successfully
 #if _WIN32
   Sleep(5000);
 #else
