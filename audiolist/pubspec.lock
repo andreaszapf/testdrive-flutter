@@ -64,6 +64,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.2.4"
+  find_audiofiles:
+    dependency: "direct main"
+    description:
+      path: "../find_audiofiles"
+      relative: true
+    source: path
+    version: "0.0.1"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -205,4 +212,4 @@ packages:
     version: "3.1.3"
 sdks:
   dart: ">=2.18.6 <3.0.0"
-  flutter: ">=2.8.0"
+  flutter: ">=2.11.0"

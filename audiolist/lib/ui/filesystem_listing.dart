@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-import '../data/filesystem_entry.dart';
+import 'package:find_audiofiles/find_audiofiles.dart';
 
 class FilesystemListing extends StatefulWidget {
   const FilesystemListing({super.key, required this.listingStream});

@@ -32,6 +32,8 @@ dependencies:
   flutter:
     sdk: flutter
   file_picker:
+  find_audiofiles:
+    path: ../find_audiofiles
 
 
   # The following adds the Cupertino Icons font to your application.

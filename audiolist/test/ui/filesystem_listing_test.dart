@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:audiolist/data/filesystem_entry.dart';
+import 'package:find_audiofiles/find_audiofiles.dart';
 import 'package:audiolist/ui/filesystem_listing.dart';
 
 void main() {
