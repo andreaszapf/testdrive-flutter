@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:find_audiofiles/find_audiofiles.dart' as find_audiofiles;
+import 'package:test_data/test_data.dart' as test_data;
 
 void main() {
   runApp(const MyApp());
@@ -11,18 +12,27 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  _MyAppState createState() => _MyAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  late int sumResult;
-  late Future<int> sumAsyncResult;
+  String firstFile = '';
 
   @override
   void initState() {
     super.initState();
-    sumResult = find_audiofiles.sum(1, 2);
-    sumAsyncResult = find_audiofiles.sumAsync(3, 4);
+
+    (() async {
+      final destDir = await getApplicationSupportDirectory();
+      await test_data.copyData(destDir.path);
+      final firstFile = (await find_audiofiles
+              .findAudioFiles('${destDir.path}/test_data')
+              .first)
+          .path;
+      setState(() {
+        this.firstFile = firstFile;
+      });
+    })();
   }
 
   @override
@@ -32,7 +42,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Native Packages'),
+          title: const Text('Listing audio files natively'),
         ),
         body: SingleChildScrollView(
           child: Container(
@@ -40,29 +50,17 @@ class _MyAppState extends State<MyApp> {
             child: Column(
               children: [
                 const Text(
-                  'This calls a native function through FFI that is shipped as source in the package. '
-                  'The native code is built as part of the Flutter Runner build.',
+                  'This calls native functions through FFI that are linked '
+                  'from a C library outside the package. The native code is '
+                  'built as part of the Flutter Runner build.',
                   style: textStyle,
                   textAlign: TextAlign.center,
                 ),
                 spacerSmall,
                 Text(
-                  'sum(1, 2) = $sumResult',
+                  'First file found: $firstFile',
                   style: textStyle,
                   textAlign: TextAlign.center,
-                ),
-                spacerSmall,
-                FutureBuilder<int>(
-                  future: sumAsyncResult,
-                  builder: (BuildContext context, AsyncSnapshot<int> value) {
-                    final displayValue =
-                        (value.hasData) ? value.data : 'loading';
-                    return Text(
-                      'await sumAsync(3, 4) = $displayValue',
-                      style: textStyle,
-                      textAlign: TextAlign.center,
-                    );
-                  },
                 ),
               ],
             ),
