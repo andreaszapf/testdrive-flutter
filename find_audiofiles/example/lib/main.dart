@@ -26,7 +26,7 @@ class _MyAppState extends State<MyApp> {
       final destDir = await getApplicationSupportDirectory();
       await test_data.copyData(destDir.path);
       final firstFile = (await find_audiofiles
-              .findAudioFiles('${destDir.path}/test_data')
+              .findAudioFilesUsingCallbacks('${destDir.path}/test_data')
               .first)
           .path;
       setState(() {

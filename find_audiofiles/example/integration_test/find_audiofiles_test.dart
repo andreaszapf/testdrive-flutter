@@ -14,6 +14,9 @@ bool _isAudioFile(FileSystemEntity entity) {
       RegExp(r'.*\.(mp3|MP3|m4a|M4A|m4b|M4B)$').hasMatch(entity.path);
 }
 
+// ignore: prefer_generic_function_type_aliases
+typedef Stream<FilesystemEntry> FindAudiofilesFunc(String path);
+
 void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -25,11 +28,15 @@ void main() async {
       .where(_isAudioFile)
       .map((e) => RegExp(r'[^\\/]+$').firstMatch(e.path)!.group(0)!));
 
+  final variants = ValueVariant<FindAudiofilesFunc>(
+      <FindAudiofilesFunc>{findAudioFiles, findAudioFilesUsingCallbacks});
+
   testWidgets('Test data files are listed', (tester) async {
+    final func = variants.currentValue!;
     app.main();
     await tester.pumpAndSettle();
-    final audiofiles = await findAudioFiles(testDataDir.path).toList();
+    final audiofiles = await func(testDataDir.path).toList();
     expect(audiofiles, isNotEmpty);
     expect(audiofiles.map((e) => path.basename(e.path)), audioFileNames);
-  });
+  }, variant: variants);
 }

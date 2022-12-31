@@ -81,6 +81,71 @@ class FindAudiofilesBindings {
           'faf_close_wrapper');
   late final _faf_close_wrapper = _faf_close_wrapperPtr
       .asFunction<void Function(ffi.Pointer<faf_context>)>();
+
+  ffi.Pointer<audiofile_scanner> make_audiofile_scanner(
+    ffi.Pointer<ffi.Char> directory,
+    ffi.Pointer<ffi.Int> error_code,
+  ) {
+    return _make_audiofile_scanner(
+      directory,
+      error_code,
+    );
+  }
+
+  late final _make_audiofile_scannerPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<audiofile_scanner> Function(ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Int>)>>('make_audiofile_scanner');
+  late final _make_audiofile_scanner = _make_audiofile_scannerPtr.asFunction<
+      ffi.Pointer<audiofile_scanner> Function(
+          ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Int>)>();
+
+  int audiofile_scanner_scan(
+    ffi.Pointer<audiofile_scanner> scanner,
+    audiofile_scanner_callback callback,
+  ) {
+    return _audiofile_scanner_scan(
+      scanner,
+      callback,
+    );
+  }
+
+  late final _audiofile_scanner_scanPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int Function(ffi.Pointer<audiofile_scanner>,
+              audiofile_scanner_callback)>>('audiofile_scanner_scan');
+  late final _audiofile_scanner_scan = _audiofile_scanner_scanPtr.asFunction<
+      int Function(
+          ffi.Pointer<audiofile_scanner>, audiofile_scanner_callback)>();
+
+  int audiofile_scanner_cancel_scan(
+    ffi.Pointer<audiofile_scanner> scanner,
+  ) {
+    return _audiofile_scanner_cancel_scan(
+      scanner,
+    );
+  }
+
+  late final _audiofile_scanner_cancel_scanPtr = _lookup<
+          ffi.NativeFunction<ffi.Int Function(ffi.Pointer<audiofile_scanner>)>>(
+      'audiofile_scanner_cancel_scan');
+  late final _audiofile_scanner_cancel_scan = _audiofile_scanner_cancel_scanPtr
+      .asFunction<int Function(ffi.Pointer<audiofile_scanner>)>();
+
+  void audiofile_scanner_close(
+    ffi.Pointer<audiofile_scanner> scanner,
+  ) {
+    return _audiofile_scanner_close(
+      scanner,
+    );
+  }
+
+  late final audiofile_scanner_closePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Pointer<audiofile_scanner>)>>('audiofile_scanner_close');
+  late final _audiofile_scanner_close = audiofile_scanner_closePtr
+      .asFunction<void Function(ffi.Pointer<audiofile_scanner>)>();
 }
 
 class faf_context extends ffi.Opaque {}
@@ -88,3 +153,8 @@ class faf_context extends ffi.Opaque {}
 class faf_filesystem_entry extends ffi.Struct {
   external ffi.Pointer<ffi.Char> path;
 }
+
+class audiofile_scanner extends ffi.Opaque {}
+
+typedef audiofile_scanner_callback = ffi.Pointer<
+    ffi.NativeFunction<ffi.Void Function(ffi.Pointer<faf_filesystem_entry>)>>;
