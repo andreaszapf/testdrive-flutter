@@ -16,7 +16,7 @@ add_subdirectory(
   "${CMAKE_CURRENT_BINARY_DIR}/shared")
 
 add_library(find_audiofiles SHARED
-  "find_audiofiles.c"
+  "find_audiofiles.cpp"
 )
 
 target_link_libraries(find_audiofiles findaudiofiles)
