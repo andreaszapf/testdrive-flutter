@@ -1,0 +1,3 @@
+[submodule "shared/thirdparty/readerwriterqueue"]
+	path = shared/thirdparty/readerwriterqueue
+	url = https://github.com/cameron314/readerwriterqueue.git
