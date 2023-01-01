@@ -7,3 +7,5 @@ add_library(findaudiofiles STATIC
 target_include_directories(findaudiofiles PUBLIC include)
 
 target_compile_features(findaudiofiles PRIVATE cxx_std_17)
+
+target_link_libraries(findaudiofiles PRIVATE readerwriterqueue)
