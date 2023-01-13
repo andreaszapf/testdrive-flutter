@@ -1,0 +1,62 @@
+#!/bin/bash
+
+set -euo pipefail
+
+flutter_projects_with_integration_tests=(
+  find_audiofiles/example
+)
+
+function ensure_emulator()
+{
+    if (flutter devices | grep emulator- >/dev/null); then
+        return
+    fi
+
+    local first_available_emulator=$(
+        flutter emulator | grep -e "android$" | sed 's/ •.*$//g' | head -n 1
+    )
+
+    if [ -z first_available_emulator ]; then
+        echo No emulators available
+        exit 1
+    fi
+
+    flutter emulator --launch "${first_available_emulator}"
+
+    sleep 3
+
+    if (flutter devices | grep emulator- >/dev/null); then
+        return
+    fi
+
+    echo Failed to launch the emulator.
+    exit 1
+}
+
+function usage()
+{
+    echo
+    echo Usage: $(basename $0) [android]
+    echo
+    echo If the 'android' option is given, an Android emulator
+    echo is launched and connected and the tests are run on it.
+}
+
+if [ "$#" -ge 2 ]; then
+    echo "Too many arguments: $2 ..."
+    usage
+    exit 1
+fi
+
+if [ "$#" -eq 1 ] && [ "$1" == "android" ]; then
+    ensure_emulator
+elif [ "$#" -eq 1 ]; then
+    echo "Invalid argument: $1"
+    usage
+    exit 1
+fi
+
+for project in "${flutter_projects_with_integration_tests[@]}"; do
+    echo Running integration tests for "${project}"
+    (cd "${project}" && flutter test integration_test/)
+done

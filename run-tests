@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -euo pipefail
+
+flutter_projects_with_unittests=(
+  test_data
+  audiolist
+)
+
+for project in "${flutter_projects_with_unittests[@]}"; do
+    echo Running tests for "${project}"
+    (cd "${project}" && flutter test)
+done
