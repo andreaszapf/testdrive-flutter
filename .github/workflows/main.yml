@@ -17,3 +17,42 @@ jobs:
 
       - name: Run unit-tests
         run: ./run-tests
+
+  integration-tests:
+    strategy:
+      matrix:
+        platform: [windows, android]
+    runs-on: ${{ matrix.platform == 'windows' && 'windows-latest' || 'macos-latest' }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Setup flutter
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          channel: 'stable'
+
+      - name: Run integration tests (Windows)
+        if: ${{ matrix.platform == 'windows' }}
+        run: ./run-integration-tests
+
+      - if: ${{ matrix.platform == 'android' }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11.x'
+          cache: 'gradle'
+
+      - name: Run integration tests (Android)
+        if: ${{ matrix.platform == 'android' }}
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 24
+          ndk: 23.1.7779620
+          script: ./run-integration-tests android
