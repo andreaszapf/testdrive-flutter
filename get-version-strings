@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -euo pipefail
+
+GitVersionDescription=$(git describe)
+VersionDescription=${GitVersionDescription:1}
+
+echo VersionDescription=${VersionDescription}
+echo GitVersionDescription=${GitVersionDescription}
