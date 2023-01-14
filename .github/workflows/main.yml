@@ -3,34 +3,19 @@ on:
     branches: [main, test-ci**]
 
 jobs:
-  run-unittests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup flutter
-        uses: subosito/flutter-action@v2
-        with:
-          cache: true
-          channel: 'stable'
-
-      - name: Run unit-tests
-        run: ./run-tests
-
-  integration-tests:
-    strategy:
-      matrix:
-        platform: [windows, android]
-    runs-on: ${{ matrix.platform == 'windows' && 'windows-latest' || 'macos-latest' }}
+  build-windows:
+    runs-on: windows-latest
     defaults:
       run:
         shell: bash
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           submodules: true
+          # Make sure that tags are fetched which are needed to determine the version.
+          fetch-depth: 0
 
       - name: Setup flutter
         uses: subosito/flutter-action@v2
@@ -38,19 +23,64 @@ jobs:
           cache: true
           channel: 'stable'
 
-      - name: Run integration tests (Windows)
-        if: ${{ matrix.platform == 'windows' }}
-        run: ./run-integration-tests
+      - name: Run tests
+        run: |
+          ./run-tests
+          ./run-integration-tests
 
-      - if: ${{ matrix.platform == 'android' }}
+      - name: Determine version
+        run: |
+          ./get-version-strings
+          ./get-version-strings >> $GITHUB_ENV
+
+      - name: Build
+        working-directory: ./audiolist
+        run: flutter build windows --build-name=${{ env.VersionDescription }}
+
+      - name: Create zip
+        id: 'create_zip'
+        run: |
+          mkdir -p ./artifacts
+          PackageName=audiolist-${{ env.GitVersionDescription }}-win-x64
+          7z a -tzip "./artifacts/${PackageName}.zip" ./audiolist/build/windows/runner/Release/*
+          echo PackageName="${PackageName}" >> $GITHUB_OUTPUT
+
+      - name: Upload zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.create_zip.outputs.PackageName }}
+          path: "./artifacts/${{ steps.create_zip.outputs.PackageName }}.zip"
+          if-no-files-found: warn
+          retention-days: 5
+
+  test-android:
+    runs-on: 'macos-latest'
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          # Make sure that tags are fetched which are needed to determine the version.
+          fetch-depth: 0
+
+      - name: Setup flutter
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          channel: 'stable'
+
+      - name: Setup java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '11.x'
           cache: 'gradle'
 
-      - name: Run integration tests (Android)
-        if: ${{ matrix.platform == 'android' }}
+      - name: Run integration tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 24
