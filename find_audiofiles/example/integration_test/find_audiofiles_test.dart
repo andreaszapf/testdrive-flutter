@@ -20,8 +20,8 @@ typedef Stream<FilesystemEntry> FindAudiofilesFunc(String path);
 void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  final testDataDir =
-      await test_data.copyData((await getApplicationSupportDirectory()).path);
+  final testDataDir = await test_data.copyData(path.join(
+      (await getApplicationSupportDirectory()).path, "integration_tests"));
 
   final audioFileNames = List<String>.from(testDataDir
       .listSync(recursive: true)
@@ -33,7 +33,7 @@ void main() async {
 
   testWidgets('Test data files are listed', (tester) async {
     final func = variants.currentValue!;
-    app.main();
+    app.main(runMode: app.RunMode.integrationTests);
     await tester.pumpAndSettle();
     final audiofiles = await func(testDataDir.path).toList();
     expect(audiofiles, isNotEmpty);

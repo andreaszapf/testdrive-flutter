@@ -4,12 +4,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:find_audiofiles/find_audiofiles.dart' as find_audiofiles;
 import 'package:test_data/test_data.dart' as test_data;
 
-void main() {
-  runApp(const MyApp());
+enum RunMode {
+  regular,
+  integrationTests,
+}
+
+void main({RunMode runMode = RunMode.regular}) {
+  runApp(MyApp(runMode: runMode));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final RunMode runMode;
+  const MyApp({super.key, required this.runMode});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -22,16 +28,24 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
 
+    // Avoid spawning an async task in test mode
+    if (widget.runMode == RunMode.integrationTests) {
+      return;
+    }
+
     (() async {
       final destDir = await getApplicationSupportDirectory();
-      await test_data.copyData(destDir.path);
+      final testDataDir = await test_data.copyData(destDir.path);
       final firstFile = (await find_audiofiles
-              .findAudioFilesUsingCallbacks('${destDir.path}/test_data')
+              .findAudioFilesUsingCallbacks(testDataDir.path)
               .first)
           .path;
-      setState(() {
-        this.firstFile = firstFile;
-      });
+      // Might be about to close
+      if (mounted) {
+        setState(() {
+          this.firstFile = firstFile;
+        });
+      }
     })();
   }
 
