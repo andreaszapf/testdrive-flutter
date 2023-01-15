@@ -86,3 +86,51 @@ jobs:
           api-level: 24
           ndk: 23.1.7779620
           script: ./run-integration-tests android
+
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          # Make sure that tags are fetched which are needed to determine the version.
+          fetch-depth: 0
+
+      - name: Setup flutter
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          channel: 'stable'
+
+      - name: Setup java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11.x'
+          cache: 'gradle'
+
+      - name: Determine version
+        run: |
+          ./get-version-strings
+          ./get-version-strings >> $GITHUB_ENV
+
+      - name: Build
+        id: 'build'
+        working-directory: ./audiolist
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 --decode > android/keystore.jks
+          echo "${{ secrets.AUDIOLIST_KEY_PROPERTIES_WITHOUT_STORE_FILE }}" > android/key.properties
+          echo storeFile="${PWD}/android/keystore.jks" >> android/key.properties
+          flutter build apk --build-name=${{ env.VersionDescription }} --target-platform=android-arm,android-arm64
+          OutputDir="${PWD}/build/app/outputs/flutter-apk"
+          mv "${OutputDir}/app-release.apk" "${OutputDir}/audiolist-${{ env.GitVersionDescription }}.apk"
+          echo OutputDir="${OutputDir}" >> $GITHUB_OUTPUT
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v3
+        with:
+          name: audiolist-${{ env.GitVersionDescription }}-android
+          path: "${{ steps.build.outputs.OutputDir }}/audiolist*.apk"
+          if-no-files-found: warn
+          retention-days: 5
