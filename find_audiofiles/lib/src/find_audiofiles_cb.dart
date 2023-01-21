@@ -36,9 +36,10 @@ class _AudioFilesScanner {
         _scan();
       },
       onCancel: () {
-        // WIP throw on failure
+        // WIP throw on failure?
         bindings.audiofile_scanner_cancel_scan(_nativeScanner);
       },
+      // Pausing seems to be possible but complicated.
     );
   }
 

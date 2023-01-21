@@ -45,6 +45,9 @@ Stream<FilesystemEntry> findAudioFiles(String path) {
     onCancel: () async {
       sendPort?.send(_Cancellation());
     },
+    // not supporting pause() doesn't seem to be critical in the audiolist app
+    // (it doesn't pull from the stream in a for-await loop, so the stream
+    // is probably never paused)
   );
 
   return streamController.stream;

@@ -28,8 +28,12 @@ void main() async {
       .where(_isAudioFile)
       .map((e) => RegExp(r'[^\\/]+$').firstMatch(e.path)!.group(0)!));
 
-  final variants = ValueVariant<FindAudiofilesFunc>(
-      <FindAudiofilesFunc>{findAudioFiles, findAudioFilesUsingCallbacks});
+  final variants = ValueVariant<FindAudiofilesFunc>(<FindAudiofilesFunc>{
+    findAudioFiles,
+    findAudioFilesUsingCallbacks,
+    findAudioFilesUsingCompute,
+    findAudioFilesUsingMessages
+  });
 
   testWidgets('Test data files are listed', (tester) async {
     final func = variants.currentValue!;

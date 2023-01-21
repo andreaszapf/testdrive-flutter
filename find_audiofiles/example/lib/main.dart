@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
       final destDir = await getApplicationSupportDirectory();
       final testDataDir = await test_data.copyData(destDir.path);
       final firstFile = (await find_audiofiles
-              .findAudioFilesUsingCallbacks(testDataDir.path)
+              .findAudioFilesUsingCompute(testDataDir.path)
               .first)
           .path;
       // Might be about to close
