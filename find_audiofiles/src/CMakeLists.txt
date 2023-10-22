@@ -13,7 +13,8 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 add_subdirectory(
   "${REPO_ROOT}/shared"
-  "${CMAKE_CURRENT_BINARY_DIR}/shared")
+  "${CMAKE_CURRENT_BINARY_DIR}/shared"
+  EXCLUDE_FROM_ALL)
 
 add_library(find_audiofiles SHARED
   "find_audiofiles.cpp"
